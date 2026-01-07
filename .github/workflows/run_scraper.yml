@@ -1,0 +1,36 @@
+name: Run Scraper on Windows
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # اجرا هر روز ساعت ۸ صبح (به وقت جهانی)
+  workflow_dispatch: # امکان اجرای دستی با دکمه از داخل پنل گیت‌هاب
+
+jobs:
+  scrape:
+    runs-on: windows-latest  # استفاده از ویندوز سرورهای گیت‌هاب
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Scraper
+      env:
+        # اتصال رازهای تعریف شده در تنظیمات گیت‌هاب به برنامه
+        WP_KEY: ${{ secrets.WP_KEY }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        # ۱. ساخت جدول‌های دیتابیس (فقط اگر وجود نداشته باشند)
+        python manage.py migrate
+        
+        # ۲. اجرای ربات اسکرپر
+        python manage.py scrape_products
