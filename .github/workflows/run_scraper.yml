@@ -2,12 +2,12 @@ name: Run Scraper on Windows
 
 on:
   schedule:
-    - cron: '0 8 * * *' # اجرا هر روز ساعت ۸ صبح
-  workflow_dispatch: # دکمه اجرای دستی
+    - cron: '0 8 * * *'
+  workflow_dispatch:
 
 jobs:
   scrape:
-    runs-on: windows-latest  # استفاده از محیط ویندوز
+    runs-on: ubuntu-latest # <--- تغییر مهم: حتما باید ubuntu باشد تا Xvfb کار کند (ویندوز Xvfb ندارد)
 
     steps:
     - name: Checkout code
@@ -18,23 +18,24 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install dependencies
+    # --- بخش جدید: نصب مانیتور مجازی ---
+    - name: Install dependencies and Xvfb
       run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb  # نصب مانیتور مجازی
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Scraper
+    - name: Run Scraper with Virtual Display
       env:
-        # لیست تمام کلیدهای مورد نیاز
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        WP_KEY: ${{ secrets.WP_KEY }} # اگر این کلید را در Secrets تعریف کردی
-        
-        # === خط حیاتی برای ویندوز ===
-        # این خط باعث می‌شود ارور فارسی در ویندوز رفع شود
+        WP_KEY: ${{ secrets.WP_KEY }}
         PYTHONIOENCODING: utf-8
-        
       run: |
         
-
-        python manage.py discover_products
+        # --- دستور جادویی: اجرا داخل محیط مجازی گرافیکی ---
+        # این دستور یک مانیتور با رزولوشن 1920x1080 می‌سازد و پایتون را داخل آن اجرا می‌کند
+        xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python manage.py discover_products
+        
+        
