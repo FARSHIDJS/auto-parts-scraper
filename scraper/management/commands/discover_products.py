@@ -50,6 +50,11 @@ class Command(BaseCommand):
                 self.stdout.write(f'  ... درحال اسکن صفحه {page_count}: {current_url}')
                 try:
                     driver.get(current_url)
+                    # === این ۳ خط دیباگ را اینجا اضافه کنید ===
+                    print(f"\n[DEBUG] Page Title: {driver.title}")
+                    print(f"[DEBUG] Current URL: {driver.current_url}")
+                    print(f"[DEBUG] Page Source Snippet: {driver.page_source[:500]}") # 500 کاراکتر اول سورس
+                    # ==========================================
 
                     # --- بستن پاپ‌آپ کوکی (مثل قبل) ---
                     try:
