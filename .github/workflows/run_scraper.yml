@@ -1,4 +1,4 @@
-name: Run Scraper on Windows
+name: Run Scraper on Ubuntu
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   scrape:
-    runs-on: ubuntu-latest # <--- تغییر مهم: حتما باید ubuntu باشد تا Xvfb کار کند (ویندوز Xvfb ندارد)
+    runs-on: ubuntu-latest # حتما باید اوبونتو باشد
 
     steps:
     - name: Checkout code
@@ -18,15 +18,15 @@ jobs:
       with:
         python-version: '3.10'
 
-    # --- بخش جدید: نصب مانیتور مجازی ---
-    - name: Install dependencies and Chrome
+    # --- نصب کروم و مانیتور مجازی ---
+    - name: Install Chrome and Xvfb
       run: |
         sudo apt-get update
-        sudo apt-get install -y xvfb google-chrome-stable  # <--- نصب کروم اصلی
+        sudo apt-get install -y google-chrome-stable xvfb
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Scraper with Virtual Display
+    - name: Run Scraper with DrissionPage
       env:
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -34,8 +34,7 @@ jobs:
         PYTHONIOENCODING: utf-8
       run: |
         
-        # --- دستور جادویی: اجرا داخل محیط مجازی گرافیکی ---
-        # این دستور یک مانیتور با رزولوشن 1920x1080 می‌سازد و پایتون را داخل آن اجرا می‌کند
+        # اجرای دستور با مانیتور مجازی (رزولوشن 1920 در 1080)
+        # این باعث می‌شود DrissionPage بتواند با Headless=False اجرا شود
         xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python manage.py discover_products
-        
         
