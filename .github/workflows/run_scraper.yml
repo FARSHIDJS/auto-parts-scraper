@@ -37,6 +37,5 @@ jobs:
       run: |
         # ساخت یا آپدیت جدول‌های دیتابیس Supabase
         python manage.py migrate
-        
-        # اجرای ربات (نام دستور را چک کن)
-        python manage.py generate_descriptions
+
+        python manage.py discover_products
