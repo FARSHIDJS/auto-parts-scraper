@@ -71,8 +71,8 @@ class Command(BaseCommand):
                     MAX_PATIENCE = 2
                     while True:
                         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                        self.stdout.write(self.style.WARNING('      ... 5 ثانیه صبر ...'))
-                        time.sleep(5)
+                        self.stdout.write(self.style.WARNING('      ... 45 ثانیه صبر ...'))
+                        time.sleep(45)
                         new_height = driver.execute_script("return document.body.scrollHeight")
                         if new_height == last_height:
                             patience_counter += 1
@@ -84,8 +84,8 @@ class Command(BaseCommand):
                             last_height = new_height
 
                     # --- صبر دستی ۳۰ ثانیه‌ای (مثل قبل) ---
-                    self.stdout.write(self.style.WARNING('  ... 30 ثانیه صبر نهایی (دستی) ...'))
-                    time.sleep(30)
+                    self.stdout.write(self.style.WARNING('  ... 60 ثانیه صبر نهایی (دستی) ...'))
+                    time.sleep(60)
                     # ---------------------------------------------
 
                     product_link_tags = driver.find_elements(By.CSS_SELECTOR, supplier.product_link_selector)
