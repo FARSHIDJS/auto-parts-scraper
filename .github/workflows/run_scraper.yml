@@ -35,7 +35,6 @@ jobs:
         PYTHONIOENCODING: utf-8
         
       run: |
-        # ساخت یا آپدیت جدول‌های دیتابیس Supabase
-        python manage.py migrate
+        
 
         python manage.py discover_products
