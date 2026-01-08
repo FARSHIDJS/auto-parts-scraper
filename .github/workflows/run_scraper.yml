@@ -2,16 +2,16 @@ name: Run Scraper on Windows
 
 on:
   schedule:
-    - cron: '0 8 * * *' # اجرا هر روز ساعت ۸ صبح (به وقت جهانی)
-  workflow_dispatch: # امکان اجرای دستی با دکمه از داخل پنل گیت‌هاب
+    - cron: '0 8 * * *' # اجرا هر روز ساعت ۸ صبح
+  workflow_dispatch: # دکمه اجرای دستی
 
 jobs:
   scrape:
-    runs-on: windows-latest  # استفاده از ویندوز سرورهای گیت‌هاب
+    runs-on: windows-latest  # استفاده از محیط ویندوز
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -25,13 +25,18 @@ jobs:
 
     - name: Run Scraper
       env:
-        # اتصال رازهای تعریف شده در تنظیمات گیت‌هاب به برنامه
-        WP_KEY: ${{ secrets.WP_KEY }}
+        # لیست تمام کلیدهای مورد نیاز
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        WP_KEY: ${{ secrets.WP_KEY }} # اگر این کلید را در Secrets تعریف کردی
+        
+        # === خط حیاتی برای ویندوز ===
+        # این خط باعث می‌شود ارور فارسی در ویندوز رفع شود
+        PYTHONIOENCODING: utf-8
+        
       run: |
-        # ۱. ساخت جدول‌های دیتابیس (فقط اگر وجود نداشته باشند)
+        # ساخت یا آپدیت جدول‌های دیتابیس Supabase
         python manage.py migrate
         
-        # ۲. اجرای ربات اسکرپر
-        python manage.py scrape_products
-        
+        # اجرای ربات (نام دستور را چک کن)
+        python manage.py generate_descriptions
