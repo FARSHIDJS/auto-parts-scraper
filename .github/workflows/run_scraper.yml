@@ -1,33 +1,37 @@
-name: Run My Robot
+name: Run Scraper on Windows
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *' # اجرا هر روز ساعت ۸ صبح (به وقت جهانی)
+  workflow_dispatch: # امکان اجرای دستی با دکمه از داخل پنل گیت‌هاب
 
 jobs:
-  run-bot:
-    # تغییر مهم 1: استفاده از لینوکس به جای ویندوز (برای پشتیبانی فارسی)
-    runs-on: ubuntu-latest
+  scrape:
+    runs-on: windows-latest  # استفاده از ویندوز سرورهای گیت‌هاب
 
     steps:
-    - name: دانلود کدها
-      uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - name: نصب پایتون
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
 
-    - name: نصب پیش‌نیازها
+    - name: Install dependencies
       run: |
-        pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: اتصال به دیتابیس و اجرا
+    - name: Run Scraper
       env:
-        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        # اتصال رازهای تعریف شده در تنظیمات گیت‌هاب به برنامه
+        WP_KEY: ${{ secrets.WP_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        # تغییر مهم 2: اجبار پایتون به استفاده از UTF-8 برای چاپ فارسی
-        PYTHONIOENCODING: utf-8
       run: |
+        # ۱. ساخت جدول‌های دیتابیس (فقط اگر وجود نداشته باشند)
         python manage.py migrate
+        
+        # ۲. اجرای ربات اسکرپر
         python manage.py scrape_products
+        
